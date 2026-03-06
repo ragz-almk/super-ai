@@ -24,7 +24,7 @@ export default async function handler(req, res) {
             callOpenAICompatibleAPI(
                 "https://api.groq.com/openai/v1/chat/completions",
                 GROQ_API_KEY,
-                "llama3-70b-8192", // Model Groq yang stabil
+                "llama-3.3-70b-versatile", // Model Groq yang stabil
                 "Kamu adalah AI Analis A. Berikan analisis awal yang tajam terhadap instruksi user.",
                 prompt
             ),
@@ -49,7 +49,7 @@ export default async function handler(req, res) {
                 callOpenAICompatibleAPI(
                     "https://api.groq.com/openai/v1/chat/completions",
                     GROQ_API_KEY,
-                    "llama3-70b-8192",
+                    "llama-3.3-70b-versatile",
                     "Kamu adalah AI A. Baca draf dari AI B berikut, cari kelemahannya, dan berikan argumen balasan yang lebih baik.",
                     `Instruksi asli: ${prompt}\n\nDraf AI B: ${currentDraftB}`
                 ),
@@ -164,4 +164,5 @@ Tugasmu: Analisis seluruh argumen di atas, periksa faktanya, gabungkan poin-poin
     const data = await response.json();
     return data.candidates[0].content.parts[0].text;
 }
+
 

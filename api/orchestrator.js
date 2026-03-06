@@ -31,7 +31,7 @@ export default async function handler(req, res) {
             callOpenAICompatibleAPI(
                 "https://openrouter.ai/api/v1/chat/completions",
                 OPENROUTER_API_KEY,
-                "google/gemma-2-9b-it:free", // Model OpenRouter gratis
+                "mistralai/mistral-7b-instruct:free", // Model OpenRouter gratis
                 "Kamu adalah AI Analis B. Berikan perspektif alternatif dan detail terhadap instruksi user.",
                 prompt
             )
@@ -56,7 +56,7 @@ export default async function handler(req, res) {
                 callOpenAICompatibleAPI(
                     "https://openrouter.ai/api/v1/chat/completions",
                     OPENROUTER_API_KEY,
-                    "google/gemma-2-9b-it:free",
+                    "mistralai/mistral-7b-instruct:free",
                     "Kamu adalah AI B. Baca draf dari AI A berikut, perbaiki data yang salah, dan berikan bantahan yang logis.",
                     `Instruksi asli: ${prompt}\n\nDraf AI A: ${currentDraftA}`
                 )
@@ -164,3 +164,4 @@ Tugasmu: Analisis seluruh argumen di atas, periksa faktanya, gabungkan poin-poin
     const data = await response.json();
     return data.candidates[0].content.parts[0].text;
 }
+

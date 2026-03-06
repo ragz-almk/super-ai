@@ -1,7 +1,8 @@
-// Memaksimalkan waktu eksekusi Vercel agar tidak putus di tengah jalan (maksimal 60 detik untuk versi Hobby/Gratis)
-export const maxDuration = 60;
+// api/orchestrator.js
 
-export default async function handler(req, res) {
+// Menggunakan format CommonJS yang paling stabil untuk Vercel
+module.exports = async function handler(req, res) {
+    // 1. Validasi Method
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Hanya menerima method POST' });
     }
@@ -18,20 +19,20 @@ export default async function handler(req, res) {
         const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
         // ==========================================
-        // FASE 1 & 2: DRAFTING (Berjalan Paralel)
+        // FASE 1 & 2: DRAFTING (Paralel)
         // ==========================================
         const [draftGroq, draftOpenRouter] = await Promise.all([
             callOpenAICompatibleAPI(
                 "https://api.groq.com/openai/v1/chat/completions",
                 GROQ_API_KEY,
-                "llama-3.3-70b-versatile", // Model Groq yang stabil
+                "llama-3.3-70b-versatile", 
                 "Kamu adalah AI Analis A. Berikan analisis awal yang tajam terhadap instruksi user.",
                 prompt
             ),
             callOpenAICompatibleAPI(
                 "https://openrouter.ai/api/v1/chat/completions",
                 OPENROUTER_API_KEY,
-                "openrouter/free", // Model OpenRouter gratis
+                "openrouter/free", 
                 "Kamu adalah AI Analis B. Berikan perspektif alternatif dan detail terhadap instruksi user.",
                 prompt
             )
@@ -68,7 +69,7 @@ export default async function handler(req, res) {
         }
 
         // ==========================================
-        // FASE 4: SINTESIS (HAKIM GEMINI)
+        // FASE 4: SINTESIS (HAKIM GEMINI 2.5 FLASH)
         // ==========================================
         const finalSynthesis = await callGeminiAPI(
             GEMINI_API_KEY, 
@@ -77,16 +78,18 @@ export default async function handler(req, res) {
             images
         );
 
+        // Berhasil! Kembalikan JSON ke frontend
         return res.status(200).json({
             finalOutput: finalSynthesis,
             debateHistory: debateHistory
         });
 
     } catch (error) {
+        // Tangkap error dan kembalikan format JSON agar frontend tidak error "Unexpected token A"
         console.error("Error Utama di Orchestrator:", error);
         return res.status(500).json({ error: 'Terjadi kesalahan pada server AI', details: error.message });
     }
-}
+};
 
 // --- FUNGSI BANTUAN ---
 
@@ -110,7 +113,6 @@ async function callOpenAICompatibleAPI(url, apiKey, model, systemPrompt, userPro
 
     if (!response.ok) {
         const errorText = await response.text();
-        console.error(`[Error dari API ${model}]:`, errorText);
         throw new Error(`Gagal memanggil model ${model}. Status: ${response.status}. Pesan: ${errorText}`);
     }
 
@@ -119,7 +121,7 @@ async function callOpenAICompatibleAPI(url, apiKey, model, systemPrompt, userPro
 }
 
 async function callGeminiAPI(apiKey, originalPrompt, debateHistory, images) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey};
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
     
     const fullPrompt = `Kamu adalah Hakim AI tingkat tinggi. 
 Instruksi awal dari user adalah: "${originalPrompt}".
@@ -157,17 +159,9 @@ Tugasmu: Analisis seluruh argumen di atas, periksa faktanya, gabungkan poin-poin
 
     if (!response.ok) {
         const errorText = await response.text();
-        console.error(`[Error dari API Gemini]:`, errorText);
         throw new Error(`Gagal memanggil Gemini. Status: ${response.status}. Pesan: ${errorText}`);
     }
 
     const data = await response.json();
     return data.candidates[0].content.parts[0].text;
 }
-
-
-
-
-
-
-

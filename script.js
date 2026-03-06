@@ -88,10 +88,8 @@ async function mulaiProses() {
         });
 
         if (!response.ok) {
-        // Kita ambil detail error langsung dari server provider
-            const errorData = await response.text(); 
-            console.error(`[Detail Error API - ${model}]:`, errorData);
-            throw new Error(`Gagal memanggil model ${model}. Status: ${response.status}. Detail: ${errorData}`);
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Gagal menghubungi server AI");
         }
 
         updateMonitor("Menyusun Jawaban Final...", 80);

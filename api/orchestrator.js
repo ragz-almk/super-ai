@@ -119,7 +119,7 @@ async function callOpenAICompatibleAPI(url, apiKey, model, systemPrompt, userPro
 }
 
 async function callGeminiAPI(apiKey, originalPrompt, debateHistory, images) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey};
     
     const fullPrompt = `Kamu adalah Hakim AI tingkat tinggi. 
 Instruksi awal dari user adalah: "${originalPrompt}".
@@ -164,6 +164,7 @@ Tugasmu: Analisis seluruh argumen di atas, periksa faktanya, gabungkan poin-poin
     const data = await response.json();
     return data.candidates[0].content.parts[0].text;
 }
+
 
 
 

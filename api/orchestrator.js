@@ -1,7 +1,6 @@
 // api/orchestrator.js
 
-// Menggunakan format CommonJS yang paling stabil untuk Vercel
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
     // 1. Validasi Method
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Hanya menerima method POST' });
@@ -85,11 +84,11 @@ module.exports = async function handler(req, res) {
         });
 
     } catch (error) {
-        // Tangkap error dan kembalikan format JSON agar frontend tidak error "Unexpected token A"
+        // Tangkap error dan kembalikan format JSON
         console.error("Error Utama di Orchestrator:", error);
         return res.status(500).json({ error: 'Terjadi kesalahan pada server AI', details: error.message });
     }
-};
+}
 
 // --- FUNGSI BANTUAN ---
 
